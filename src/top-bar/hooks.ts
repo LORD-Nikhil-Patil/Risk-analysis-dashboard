@@ -10,8 +10,6 @@ export const useFilterList = () => {
     
     const handleSelect = useCallback((filter: string, value: string) => {
 
-        console.log("handleSelect", filter, value);
-
         if(filter === "country"){
            dispatch(setCountry(value));
         }

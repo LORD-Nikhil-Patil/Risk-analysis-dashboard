@@ -3,7 +3,7 @@ import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 interface FilterObject {
     country: string;
     region: string;
-    year: string;
+    end_year: string;
     topic: string;
     pestle: string;
     start_year: string;
@@ -25,7 +25,7 @@ const initialState: FilterObjectState = {
         selectData: {
             country: '',
             region: '',
-            year: '',
+            end_year: '',
             topic: '',
             pestle: '',
             start_year: '',
@@ -47,7 +47,7 @@ const filterSlice = createSlice({
             state.filter.selectData.region = action.payload;
         },
         setYear(state, action: PayloadAction<string>) {
-            state.filter.selectData.year = action.payload;
+            state.filter.selectData.end_year = action.payload;
         },
         setTopic(state, action: PayloadAction<string>) {
             state.filter.selectData.topic = action.payload;
