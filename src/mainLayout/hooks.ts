@@ -1,9 +1,9 @@
-import { useEffect } from "react";
+import { useEffect, useState, useMemo } from "react";
+import { fetchDataList } from "./actions";
+import { useAppDispatch, useAppSelector, RootState, createStore } from "../store";
+import { createSelector } from 'reselect'
 
-import {fetchDataList} from "./actions"
-import { useAppDispatch, useAppSelector, RootState } from "../store";
-
-interface list {
+interface ListItem {
     end_year: number;
     intensity: string;
     sector: string;
@@ -24,10 +24,28 @@ interface list {
     id: string;
 }
 
+interface DataObject {
+    x: number;
+    y: number;
+    source: string;
+    insight: string;
+}
+
 export const useDataList = () => {
-    const dispatch = useAppDispatch()
-    const list:list[]  = useAppSelector((state) => state.listSlice.List.data);
-    const selectedFilterOption = useAppSelector((state) => state.filterValues.filter.selectData);
+    const dispatch = useAppDispatch();
+    
+    const selectSelf = (state: RootState) => state;
+    const listMemo = createSelector(selectSelf, (state) => state.listSlice.List.data);
+    const filterMemo =  createSelector(selectSelf, (state) => state.filterValues.filter.selectData);
+    const list: ListItem[] = useAppSelector(listMemo);
+    const selectedFilterOption = useAppSelector(filterMemo);
+
+
+    const [chartData, setChartData] = useState<{
+        intensity: DataObject[];
+        likelihoodData: DataObject[];
+        relevanceData: DataObject[];
+    }>({ intensity: [], likelihoodData: [], relevanceData: [] });
 
     const filterNonEmptyValues = (obj: any) => {
         const filteredObj: any = {};
@@ -38,24 +56,60 @@ export const useDataList = () => {
         });
         return filteredObj;
     };
-    
-    const filteredObject = filterNonEmptyValues(selectedFilterOption);
-    
-    const params = {
-        params: {
-            ...filteredObject
-        }
-    };
 
-    useEffect(()=>{
-     dispatch(fetchDataList(params))
-    },[])
+    const filteredObject = useMemo(() => filterNonEmptyValues(selectedFilterOption), [selectedFilterOption]);
+    console.log("filteredObject", filteredObject)
+    useEffect(() => {
+        const params = {
+            params: {
+                ...filteredObject
+            }
+        };
+        dispatch(fetchDataList(params));
+    }, [dispatch, filteredObject]);
 
-    useEffect(()=>{
-        dispatch(fetchDataList(params))
-    }, [selectedFilterOption])
+    useEffect(() => {
+        const generateData = () => {
+            const filterData = (data: DataObject[]): DataObject[] => {
+                let currentX: number | null = null;
+                let maxY: number = -Infinity;
+                const filteredArray: DataObject[] = [];
+                data.forEach(obj => {
+                    const { x, y } = obj;
+                    if (x !== currentX) {
+                        currentX = x;
+                        maxY = y;
+                        filteredArray.push(obj);
+                    } else {
+                        if (y > maxY) {
+                            maxY = y;
+                            filteredArray.pop();
+                            filteredArray.push(obj);
+                        }
+                    }
+                });
+                return filteredArray;
+            };
 
-    return{
+            const processData = (key: keyof ListItem) => list.map((item) => ({
+                x: isNaN(Number(item.end_year)) ? 0 : Number(item.end_year),
+                y: Number(item[key]),
+                source: item.source,
+                insight: item.insight
+            })).sort((a, b) => a.x - b.x);
+
+            setChartData({
+                intensity: filterData(processData('intensity')),
+                likelihoodData: filterData(processData('likelihood')),
+                relevanceData: filterData(processData('relevance'))
+            });
+        };
+
+        generateData();
+    }, [list]);
+
+    return {
+        chartData,
         list
-    }
-}
+    };
+};

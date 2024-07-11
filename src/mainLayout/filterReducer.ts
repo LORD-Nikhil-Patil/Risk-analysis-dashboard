@@ -25,7 +25,7 @@ const initialState: FilterObjectState = {
         selectData: {
             country: '',
             region: '',
-            end_year: '',
+            end_year: "2018",
             topic: '',
             pestle: '',
             start_year: '',

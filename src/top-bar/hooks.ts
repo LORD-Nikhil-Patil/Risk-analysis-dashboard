@@ -1,6 +1,5 @@
 import { useCallback, useEffect } from "react";
 
-import {fetchFilterList} from "./actions"
 import { useAppDispatch, useAppSelector, RootState } from "../store";
 import {setCountry, setRegion, setYear} from "../mainLayout/filterReducer";
 
@@ -22,15 +21,10 @@ export const useFilterList = () => {
             dispatch(setYear(value));
 
         }
-    },[])
-
-    useEffect(()=>{
-     dispatch(fetchFilterList({}))
-    },[])
+    },[filterOptions])
 
     return{
         filterOptions,
-
         handleSelect
     }
 }
