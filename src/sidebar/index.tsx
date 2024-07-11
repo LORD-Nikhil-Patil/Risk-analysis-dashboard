@@ -21,7 +21,7 @@ const Sidebar = () => {
                   <DropdownSelect options={filterOptions.pestle} handleSelect={handleSelect} placeholder={"pestle"} />
                </li>
                <li className="flex flex-row">
-                  <DropdownSelect options={filterOptions.start_year} handleSelect={handleSelect} placeholder={"start_year"} />
+                  <DropdownSelect options={filterOptions.start_year} handleSelect={handleSelect} placeholder={"start year"} />
                   <DropdownSelect options={filterOptions.sector} handleSelect={handleSelect} placeholder={"sector"} />
                </li>
                <li className="flex flex-row">
@@ -29,7 +29,7 @@ const Sidebar = () => {
                   <DropdownSelect options={filterOptions.region} handleSelect={handleSelect} placeholder={"region"} />
                </li>
                <li className="text-center">
-                  <DropdownSelect options={filterOptions.end_year} handleSelect={handleSelect} placeholder={"year"} />
+                  <DropdownSelect options={filterOptions.end_year} handleSelect={handleSelect} placeholder={"End year"} />
                </li>
             </ul>
          </div>
